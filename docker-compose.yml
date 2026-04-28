@@ -1,0 +1,52 @@
+
+services:
+  # 1. 数据库服务
+  db:
+    image: mysql:8.0
+    container_name: vocab-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: ai_vocabulary_db
+      TZ: Asia/Shanghai
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docs/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - vocab-net
+
+  # 2. 后端服务 (Go API)
+  backend:
+    build:
+      context: ./backend
+    env_file:
+      - ./backend/.env
+    container_name: vocab-backend
+    restart: always
+    #当 environment 和 env_file 同时存在时，environment 的优先级更高
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - db
+    networks:
+      - vocab-net
+
+  # 3. 前端服务 (Nginx UI)
+  frontend:
+    build:
+      context: ./frontend
+    container_name: vocab-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - vocab-net
+
+volumes:
+  mysql_data:
+
+networks:
+  vocab-net:
+    driver: bridge

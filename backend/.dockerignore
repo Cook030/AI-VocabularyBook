@@ -1,0 +1,17 @@
+# 忽略本地编译的二进制文件
+main
+*.exe
+
+# 忽略本地依赖文件夹
+vendor/
+
+# 忽略日志文件
+*.log
+
+# 忽略 Git 相关文件
+.git
+.gitignore
+
+# 忽略单元测试和文档
+*_test.go
+docs/
